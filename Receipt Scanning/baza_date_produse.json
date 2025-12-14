@@ -1,0 +1,47 @@
+{
+    "Bauturi": [
+        "cola",
+        "apa",
+        "suc",
+        "bere",
+        "monster white"
+    ],
+    "Panificatie": [
+        "paine",
+        "franzela",
+        "covrig",
+        "toast alb fel"
+    ],
+    "Lactate": [
+        "lapte",
+        "branza",
+        "unt",
+        "br top pizza",
+        "iaurt",
+        "br top r p!zza"
+    ],
+    "Animale": [
+        "hrana pisici whiskas"
+    ],
+    "Ingrijire Personala": [
+        "sampon nivea",
+        "sampoane nivea"
+    ],
+    "Altele": [
+        "garantie ambalaj"
+    ],
+    "Dulciuri": [
+        "joe nap cacao",
+        "milka croasant",
+        "paradiso desert",
+        "7days fp&van",
+        "magura praji",
+        "m&m arahide"
+    ],
+    "Casa": [
+        "bureti vase"
+    ],
+    "Mezeluri": [
+        "muschiulet kg"
+    ]
+}
