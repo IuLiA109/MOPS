@@ -7,7 +7,7 @@ from category import *
 from image_processing import *
 from text_processing import *
 
-base_path = r"C:/Users/Iulia/AppData/Local/Programs/"
+base_path = r""
 TESSERACT_CMD = base_path + r"Tesseract-OCR/tesseract.exe"
 IMAGINE_BON = 'bon1.jpeg'
 pytesseract.pytesseract.tesseract_cmd = TESSERACT_CMD
