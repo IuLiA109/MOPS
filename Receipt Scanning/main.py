@@ -6,20 +6,31 @@ from thefuzz import fuzz
 from category import *
 from image_processing import *
 from text_processing import *
+from dotenv import load_dotenv
 
-base_path = r""
+load_dotenv()
+
+base_path = rf"{os.getenv('TESSERACT_PATH')}"
 TESSERACT_CMD = base_path + r"Tesseract-OCR/tesseract.exe"
 IMAGINE_BON = 'bon1.jpeg'
 pytesseract.pytesseract.tesseract_cmd = TESSERACT_CMD
 
 def afisare_rezultate(rezultate, rand_total):
-    print("REZULTAT FINAL CLASIFICARE BON")
-    print("="*50)
-    for r in rezultate:
-        print(f"| {r['categorie']:<20} | {r['produs']:<25} | {r['pret']:<6} RON |")
-    if rand_total:
-        print("TOTAL BON (Text extras):", rand_total)
-    print("="*50)
+    data = {
+        "produse": [
+            {
+                "produs": r["produs"],
+                "pret": r["pret"],
+                "categorie": r["categorie"]
+            }
+            for r in rezultate
+        ]
+    }
+
+    if rand_total is not None:
+        data["total"] = rand_total
+
+    print(json.dumps(data, indent=4, ensure_ascii=False))
 
 def main():
     img = cv.imread(IMAGINE_BON)
@@ -28,10 +39,10 @@ def main():
         return
 
     bon = extrage_bon(img)
-    show_image("Bon Decupat", bon)
+    # show_image("Bon Decupat", bon)
     
     gray_upscaled, binary_map = preprocesare_generala(bon)
-    show_image("Binarizare pentru Linii", binary_map)
+    # show_image("Binarizare pentru Linii", binary_map)
     
     slices_linii = extrage_linii_text(gray_upscaled, binary_map)
     text_integral = ""
