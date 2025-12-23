@@ -9,14 +9,7 @@
 
 ### Python Dependencies
 
-All Python dependencies are listed in `requirements.txt`
-```bash
-opencv-python
-numpy
-pytesseract
-thefuzz
-python-Levenshtein
-```
+All Python dependencies are listed in `requirements.txt`.
 
 ## Installation
 

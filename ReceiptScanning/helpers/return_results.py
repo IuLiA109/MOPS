@@ -3,16 +3,21 @@ import numpy as np
 import pytesseract
 import re
 from thefuzz import fuzz
-from category import *
-from image_processing import *
-from text_processing import *
+from helpers.category import *
+from helpers.image_processing import *
+from helpers.text_processing import *
 from dotenv import load_dotenv
+import sys
 
 load_dotenv()
 
 base_path = rf"{os.getenv('TESSERACT_PATH')}"
 TESSERACT_CMD = base_path + r"Tesseract-OCR/tesseract.exe"
-IMAGINE_BON = 'bon1.jpeg'
+# if len(sys.argv) < 2:
+#     raise ValueError("Utilizare: python main.py <cale_catre_imagine_bon>")
+#     sys.exit(1)
+
+# IMAGINE_BON = sys.argv[1]
 pytesseract.pytesseract.tesseract_cmd = TESSERACT_CMD
 
 def afisare_rezultate(rezultate, rand_total):
@@ -28,11 +33,12 @@ def afisare_rezultate(rezultate, rand_total):
     }
 
     if rand_total is not None:
-        data["total"] = rand_total
+        data["total"] = float(rand_total.split()[-1])
 
-    print(json.dumps(data, indent=4, ensure_ascii=False))
+    # print(json.dumps(data, indent=4, ensure_ascii=False))
+    return data
 
-def main():
+def return_results(IMAGINE_BON):
     img = cv.imread(IMAGINE_BON)
     if img is None:
         print(f"Eroare: Imaginea '{IMAGINE_BON}' nu exista sau nu a putut fi citita.")
@@ -62,7 +68,4 @@ def main():
         
     lista_produse_finale = procesare_date_brute(date_brute_produse)
     rezultate = clasifica_produse(lista_produse_finale)
-    afisare_rezultate(rezultate, rand_total)
-
-if __name__ == "__main__":
-    main()
+    return afisare_rezultate(rezultate, rand_total)
