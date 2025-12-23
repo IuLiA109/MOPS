@@ -1,0 +1,9 @@
+opencv-python
+numpy
+pytesseract
+thefuzz
+python-Levenshtein
+dotenv
+fastapi
+python-multipart
+uvicorn
