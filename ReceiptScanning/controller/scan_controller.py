@@ -8,6 +8,10 @@ import os
 
 app = FastAPI()
 
+API_KEY = os.getenv("API_KEY")
+async def verify_key(x_api_key: str = Header(...)):
+    if API_KEY is None or x_api_key != API_KEY:
+        raise HTTPException(status_code=403, detail="Invalid API key")
 
 @app.on_event("startup")
 async def startup_event():
@@ -20,7 +24,7 @@ class ScanResponse(BaseModel):
     total: Optional[float] = None
 
 
-@app.post("/scan", response_model=ScanResponse)
+@app.post("/scan", response_model=ScanResponse,dependencies=[Depends(verify_key)])
 async def scan_receipt(file: UploadFile = File(...)):
     data={}
     try:

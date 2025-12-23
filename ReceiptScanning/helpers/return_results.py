@@ -8,16 +8,22 @@ from helpers.image_processing import *
 from helpers.text_processing import *
 from dotenv import load_dotenv
 import sys
+import platform
 
 load_dotenv()
 
-base_path = rf"{os.getenv('TESSERACT_PATH')}"
-TESSERACT_CMD = base_path + r"Tesseract-OCR/tesseract.exe"
+if platform.system() == "Windows":
+    base_path = rf"{os.getenv('TESSERACT_PATH')}"
+    TESSERACT_CMD = base_path + r"Tesseract-OCR/tesseract.exe"
 # if len(sys.argv) < 2:
 #     raise ValueError("Utilizare: python main.py <cale_catre_imagine_bon>")
 #     sys.exit(1)
 
 # IMAGINE_BON = sys.argv[1]
+
+if platform.system() == "Linux":
+    TESSERACT_CMD = "tesseract"
+
 pytesseract.pytesseract.tesseract_cmd = TESSERACT_CMD
 
 def afisare_rezultate(rezultate, rand_total):
