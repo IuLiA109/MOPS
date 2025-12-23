@@ -20,15 +20,15 @@ def salveaza_baza_date(db):
         json.dump(db, f, indent=4, ensure_ascii=False)
 
 def cere_categorie_manual(produs, db):
-    print(f"\n" + "="*50)
-    print(f"[?] NU recunosc produsul: '{produs}'")
-    print("-" * 50)
-    categorii_existente = ", ".join(sorted(db.keys()))
-    print(f"Categorii existente: {categorii_existente}")
-    print("-" * 50)
+    # print(f"\n" + "="*50)
+    # print(f"[?] NU recunosc produsul: '{produs}'")
+    # print("-" * 50)
+    # categorii_existente = ", ".join(sorted(db.keys()))
+    # print(f"Categorii existente: {categorii_existente}")
+    # print("-" * 50)
     
     while True:
-        raspuns = input(f">> Scrie categoria pentru '{produs}' (sau una NOUA): ").strip()
+        raspuns = "Nerecunoscut. Todo"
         
         if not raspuns:
             print("Te rog scrie un nume de categorie.")

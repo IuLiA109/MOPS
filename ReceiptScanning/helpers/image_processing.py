@@ -56,7 +56,7 @@ def extrage_bon(image, cfg=None):
         cfg["adaptive_C"]
     )
 
-    show_image("thresh", thresh)
+    # show_image("thresh", thresh)
 
     median = np.median(thresh)
     lower = int(max(0, cfg["canny_lower_coef"] * median))
@@ -90,7 +90,7 @@ def extrage_bon(image, cfg=None):
     cv.circle(image_marked, (xmax, ymax), 20, (255, 0, 0), -1)  
     cv.circle(image_marked, (xmin, ymax), 20, (0, 255, 255), -1) 
 
-    cv.imshow("colturi detectate", image_marked)
+    # cv.imshow("colturi detectate", image_marked)
     cv.waitKey(0)
 
     offset_y = 50 
