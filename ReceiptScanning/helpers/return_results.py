@@ -3,35 +3,58 @@ import numpy as np
 import pytesseract
 import re
 from thefuzz import fuzz
-from category import *
-from image_processing import *
-from text_processing import *
+from helpers.category import *
+from helpers.image_processing import *
+from helpers.text_processing import *
+from dotenv import load_dotenv
+import sys
+import platform
 
-base_path = r""
-TESSERACT_CMD = base_path + r"Tesseract-OCR/tesseract.exe"
-IMAGINE_BON = 'bon1.jpeg'
+load_dotenv()
+
+if platform.system() == "Windows":
+    base_path = rf"{os.getenv('TESSERACT_PATH')}"
+    TESSERACT_CMD = base_path + r"Tesseract-OCR/tesseract.exe"
+# if len(sys.argv) < 2:
+#     raise ValueError("Utilizare: python main.py <cale_catre_imagine_bon>")
+#     sys.exit(1)
+
+# IMAGINE_BON = sys.argv[1]
+
+if platform.system() == "Linux":
+    TESSERACT_CMD = "tesseract"
+
 pytesseract.pytesseract.tesseract_cmd = TESSERACT_CMD
 
 def afisare_rezultate(rezultate, rand_total):
-    print("REZULTAT FINAL CLASIFICARE BON")
-    print("="*50)
-    for r in rezultate:
-        print(f"| {r['categorie']:<20} | {r['produs']:<25} | {r['pret']:<6} RON |")
-    if rand_total:
-        print("TOTAL BON (Text extras):", rand_total)
-    print("="*50)
+    data = {
+        "produse": [
+            {
+                "produs": r["produs"],
+                "pret": r["pret"],
+                "categorie": r["categorie"]
+            }
+            for r in rezultate
+        ]
+    }
 
-def main():
+    if rand_total is not None:
+        data["total"] = float(rand_total.split()[-1])
+
+    # print(json.dumps(data, indent=4, ensure_ascii=False))
+    return data
+
+def return_results(IMAGINE_BON):
     img = cv.imread(IMAGINE_BON)
     if img is None:
         print(f"Eroare: Imaginea '{IMAGINE_BON}' nu exista sau nu a putut fi citita.")
         return
 
     bon = extrage_bon(img)
-    show_image("Bon Decupat", bon)
+    # show_image("Bon Decupat", bon)
     
     gray_upscaled, binary_map = preprocesare_generala(bon)
-    show_image("Binarizare pentru Linii", binary_map)
+    # show_image("Binarizare pentru Linii", binary_map)
     
     slices_linii = extrage_linii_text(gray_upscaled, binary_map)
     text_integral = ""
@@ -51,7 +74,4 @@ def main():
         
     lista_produse_finale = procesare_date_brute(date_brute_produse)
     rezultate = clasifica_produse(lista_produse_finale)
-    afisare_rezultate(rezultate, rand_total)
-
-if __name__ == "__main__":
-    main()
+    return afisare_rezultate(rezultate, rand_total)
