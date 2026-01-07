@@ -8,22 +8,16 @@ from helpers.image_processing import *
 from helpers.text_processing import *
 from dotenv import load_dotenv
 import sys
-import platform
 
 load_dotenv()
 
-if platform.system() == "Windows":
-    base_path = rf"{os.getenv('TESSERACT_PATH')}"
-    TESSERACT_CMD = base_path + r"Tesseract-OCR/tesseract.exe"
+base_path = rf"{os.getenv('TESSERACT_PATH')}"
+TESSERACT_CMD = base_path + r"Tesseract-OCR/tesseract.exe"
 # if len(sys.argv) < 2:
 #     raise ValueError("Utilizare: python main.py <cale_catre_imagine_bon>")
 #     sys.exit(1)
 
 # IMAGINE_BON = sys.argv[1]
-
-if platform.system() == "Linux":
-    TESSERACT_CMD = "tesseract"
-
 pytesseract.pytesseract.tesseract_cmd = TESSERACT_CMD
 
 def afisare_rezultate(rezultate, rand_total):
@@ -52,7 +46,9 @@ def return_results(IMAGINE_BON):
 
     bon = extrage_bon(img)
     # show_image("Bon Decupat", bon)
-    
+    if bon is None or bon.size == 0:
+        print("Eroare: extrage_bon a returnat o imagine goala.")
+        return None
     gray_upscaled, binary_map = preprocesare_generala(bon)
     # show_image("Binarizare pentru Linii", binary_map)
     

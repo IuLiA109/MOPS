@@ -4,4 +4,7 @@
 .vscode/
 env/
 venv/
-
+*.jpg
+*.jpeg
+*.png
+*.idea
