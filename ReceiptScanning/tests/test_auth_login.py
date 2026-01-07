@@ -4,6 +4,11 @@ from httpx import AsyncClient
 
 JWT_COOKIE_NAME = "access_token"
 
+@pytest.fixture(autouse=True)
+async def register(async_client: AsyncClient):
+    payload = {"username":"radush","email": "a@radush.ro", "password": "Secret123!"}
+    r = await async_client.post("/auth/register", json=payload)
+
 
 @pytest.mark.anyio
 async def test_auth_login_using_email_sets_jwt_cookie(async_client: AsyncClient):
@@ -35,7 +40,7 @@ async def test_auth_login_does_not_set_cookie_on_failure(async_client: AsyncClie
     payload = {"email": "a@radush.ro", "password": "incorrect"}
     r = await async_client.post("/auth/login", json=payload)
     assert r.status_code == 403
-    assert r.json()["message"] == "Invalid account details."
+    assert r.json()["detail"] == "Invalid account details."
     assert r.headers.get("set-cookie") is None
 
 

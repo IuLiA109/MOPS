@@ -14,4 +14,10 @@ pydantic~=2.12.5
 SQLAlchemy~=2.0.45
 
 PyMySQL~=1.1.2
-base~=0.0.0
+passlib~=1.7.4
+python-jose
+cryptography
+aiomysql
+bcrypt==4.3.0
+fastapi-jwt
+aiosqlite~=0.22.1

@@ -5,8 +5,12 @@ JWT_COOKIE_NAME = "access_token"
 
 
 async def _login(async_client: AsyncClient):
+    payload = {"username":"radush","email": "a@radush.ro", "password": "Secret123!"}
+    r = await async_client.post("/auth/register", json=payload)
+    assert r.status_code == 201
     payload = {"email": "a@radush.ro", "password": "Secret123!"}
     r = await async_client.post("/auth/login", json=payload)
+    print(r.json())
     assert r.status_code == 200
     return r
 

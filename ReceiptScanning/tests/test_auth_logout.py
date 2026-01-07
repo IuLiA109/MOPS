@@ -6,6 +6,11 @@ JWT_COOKIE_NAME = "access_token"
 
 @pytest.mark.anyio
 async def test_auth_logout_clears_cookie(async_client: AsyncClient):
+    payload = {"username": "radush", "email": "a@radush.ro", "password": "Secret123!"}
+
+    r1 = await async_client.post("/auth/register", json=payload)
+    assert r1.status_code == 201,r1.json()
+
     r = await async_client.post("/auth/login", json={"email": "a@radush.ro", "password": "Secret123!"})
     assert r.status_code == 200
 

@@ -1,35 +1,26 @@
 import os
-import pytest
-import sqlalchemy as db
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from dotenv import load_dotenv
+from models.base import Base
+from models.user import User
 
 load_dotenv()
-user = os.getenv("DATABASE_USER")
-password = os.getenv("DATABASE_PASSWORD")
-host = os.getenv("DATABASE_HOST")
-port = os.getenv("DATABASE_PORT")
-database = os.getenv("DATABASE_DB")
-
-DATABASE_URL = "mysql+pymysql://{0}:{1}@{2}:{3}/{4}".format(
-            user, password, host, port, database
-        )
-
-engine = db.create_engine(
-    DATABASE_URL,
-    future=True,
+DATABASE_URL = "mysql+aiomysql://{0}:{1}@{2}:{3}/{4}".format(
+    os.getenv("DATABASE_USER"),
+    os.getenv("DATABASE_PASSWORD"),
+    os.getenv("DATABASE_HOST"),
+    os.getenv("DATABASE_PORT"),
+    os.getenv("DATABASE_DB")
 )
 
-SessionLocal = sessionmaker(
+engine = create_async_engine(DATABASE_URL, future=True)
+
+AsyncSessionLocal = async_sessionmaker(
     bind=engine,
-    autoflush=False,
-    autocommit=False,
+    expire_on_commit=False,
+    class_=AsyncSession
 )
 
-
-def get_db():
-    db_session = SessionLocal()
-    try:
-        yield db_session
-    finally:
-        db_session.close()
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        yield session
