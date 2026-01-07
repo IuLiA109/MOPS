@@ -1,6 +1,7 @@
 import asyncio
 import uvicorn
-from controller.scan_controller import app
+from fastapi import FastAPI
+app = FastAPI()
 
 async def start_api():
     config = uvicorn.Config(

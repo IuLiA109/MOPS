@@ -8,21 +8,23 @@ def show_image(title,image):
     cv.waitKey(0)
     cv.destroyAllWindows()
 
-def extrage_bon(image, cfg=None):
 
+def extrage_bon(image, cfg=None):
     default_cfg = {
-        "median_blur_ksize": 15,         
-        "gauss_sigma": 75,               
-        "sharpen_weight_1": 1.4,         
-        "sharpen_weight_2": -0.9,       
-        "threshold_value": 30,           
-        "adaptive_blocksize": 11,       
-        "adaptive_C": 2,                
-        "erode_kernel_size": 3,          
-        "erode_iterations": 1,           
-        "canny_lower_coef": 0.67,        
-        "canny_upper_coef": 1.33,        
-        "contour_min_points": 150        
+        "median_blur_ksize": 15,
+        "gauss_sigma": 75,
+        "sharpen_weight_1": 1.4,
+        "sharpen_weight_2": -0.9,
+        "threshold_value": 30,
+        "adaptive_blocksize": 11,
+        "adaptive_C": 2,
+        "erode_kernel_size": 3,
+        "erode_iterations": 1,
+        "canny_lower_coef": 0.67,
+        "canny_upper_coef": 1.33,
+        "contour_min_points": 150,
+        "offset_y": 50,
+        "offset_x": 10,
     }
 
     if cfg is None:
@@ -32,21 +34,20 @@ def extrage_bon(image, cfg=None):
         temp.update(cfg)
         cfg = temp
 
+    if image is None or image.size == 0:
+        return None
+
+    h, w = image.shape[:2]
     original_image = image.copy()
+
     gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
     mblur = cv.medianBlur(gray, cfg["median_blur_ksize"])
     gblur = cv.GaussianBlur(mblur, (0, 0), cfg["gauss_sigma"])
     sharpen = cv.addWeighted(
-        mblur,
-        cfg["sharpen_weight_1"],
-        gblur,
-        cfg["sharpen_weight_2"],
+        mblur, cfg["sharpen_weight_1"],
+        gblur, cfg["sharpen_weight_2"],
         0
     )
-
-    _, thresh = cv.threshold(sharpen, cfg["threshold_value"], 255, cv.THRESH_BINARY)
-    kernel = np.ones((cfg["erode_kernel_size"], cfg["erode_kernel_size"]), np.uint8)
-    thresh = cv.erode(thresh, kernel, iterations=cfg["erode_iterations"])
     thresh = cv.adaptiveThreshold(
         sharpen,
         255,
@@ -56,51 +57,40 @@ def extrage_bon(image, cfg=None):
         cfg["adaptive_C"]
     )
 
-    # show_image("thresh", thresh)
-
     median = np.median(thresh)
     lower = int(max(0, cfg["canny_lower_coef"] * median))
     upper = int(min(255, cfg["canny_upper_coef"] * median))
     edges = cv.Canny(thresh, lower, upper)
+
     contours, _ = cv.findContours(edges, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-    xmin = 10000000
-    ymin = 10000000
-    xmax = 0
-    ymax = 0
 
-    for i in range(len(contours)):
-        if (len(contours[i]) > cfg["contour_min_points"]):
-            for point in contours[i].squeeze():
-                if point[0] < xmin:
-                    xmin = point[0]
+    xmin, ymin = np.inf, np.inf
+    xmax, ymax = -np.inf, -np.inf
+    found = False
 
-                if point[0] > xmax:
-                    xmax = point[0]
+    for c in contours:
+        if len(c) > cfg["contour_min_points"]:
+            pts = c.reshape(-1, 2)
+            xmin = min(xmin, pts[:, 0].min())
+            xmax = max(xmax, pts[:, 0].max())
+            ymin = min(ymin, pts[:, 1].min())
+            ymax = max(ymax, pts[:, 1].max())
+            found = True
 
-                if point[1] < ymin:
-                    ymin = point[1]
+    if not found:
+        return original_image
 
-                if point[1] > ymax:
-                    ymax = point[1]
+    xmin = int(max(0, xmin + cfg["offset_x"]))
+    ymin = int(max(0, ymin + cfg["offset_y"]))
+    xmax = int(min(w, xmax - cfg["offset_x"]))
+    ymax = int(min(h, ymax - cfg["offset_y"]))
+    if xmin >= xmax or ymin >= ymax:
+        return original_image
 
-    image_marked = original_image.copy()
+    result = original_image[ymin:ymax, xmin:xmax].copy()
+    if result.size == 0:
+        return original_image
 
-    cv.circle(image_marked, (xmin, ymin), 20, (0, 0, 255), -1)  
-    cv.circle(image_marked, (xmax, ymin), 20, (0, 255, 0), -1)  
-    cv.circle(image_marked, (xmax, ymax), 20, (255, 0, 0), -1)  
-    cv.circle(image_marked, (xmin, ymax), 20, (0, 255, 255), -1) 
-
-    # cv.imshow("colturi detectate", image_marked)
-    cv.waitKey(0)
-
-    offset_y = 50 
-    ymin_offset = ymin + offset_y
-    ymax_offset = ymax - offset_y
-    offset_x = 10 
-    xmin_offset = xmin + offset_x
-    xmax_offset = xmax - offset_x
-
-    result = original_image[ymin_offset:ymax_offset, xmin_offset:xmax_offset].copy()
     return result
 
 def preprocesare_generala(image):

@@ -2,11 +2,11 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Request,File,Upload
 from fastapi.responses import RedirectResponse
 from helpers.return_results import return_results
 from pydantic import BaseModel
-
+from main import app
 from typing import List, Dict, Union, Optional
 import os
 
-app = FastAPI()
+
 
 API_KEY = os.getenv("API_KEY")
 async def verify_key(x_api_key: str = Header(...)):
