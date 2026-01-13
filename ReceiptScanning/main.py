@@ -1,6 +1,9 @@
 import asyncio
 import uvicorn
-from controller.scan_controller import app
+from fastapi import FastAPI
+from controller.auth_controller import router
+app = FastAPI()
+app.include_router(router)
 
 async def start_api():
     config = uvicorn.Config(
