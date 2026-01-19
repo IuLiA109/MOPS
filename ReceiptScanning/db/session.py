@@ -2,7 +2,7 @@ import os
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from dotenv import load_dotenv
 from models.base import Base
-from models.user import User
+from models.users import User
 
 load_dotenv()
 DATABASE_URL = "mysql+aiomysql://{0}:{1}@{2}:{3}/{4}".format(

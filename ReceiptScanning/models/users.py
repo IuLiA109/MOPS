@@ -1,9 +1,13 @@
 from datetime import datetime
+from typing import List, Optional
 
 from sqlalchemy import String, Boolean, DateTime
-from sqlalchemy.orm import Mapped, validates,mapped_column
+from sqlalchemy.orm import Mapped, validates, mapped_column, relationship
 from models.base import Base
 import re
+
+from models.password_reset_tokens import PasswordResetToken
+from models.user_settings import UserSetting
 
 USERNAME_RE = re.compile(r"^[A-Za-z0-9_]{4,}$")
 
@@ -30,7 +34,7 @@ class User(Base):
         index=True,
         nullable=False,
     )
-
+    full_name: Mapped[Optional[str]] = mapped_column(String(255))
     password_hash: Mapped[str] = mapped_column(
         String(255),
         nullable=False,
@@ -44,7 +48,7 @@ class User(Base):
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
-        default=datetime.utcnow,
+        default=datetime.now(),
         nullable=False,
         index=True,
     )
@@ -54,3 +58,12 @@ class User(Base):
         nullable=True,
         index=True,
     )
+
+    settings: Mapped["UserSetting"] = relationship(back_populates="user", uselist=False)
+    password_reset_tokens: Mapped[List["PasswordResetToken"]] = relationship(back_populates="user")
+    accounts: Mapped[List["Account"]] = relationship(back_populates="user")
+    import_jobs: Mapped[List["ImportJob"]] = relationship(back_populates="user")
+    categories: Mapped[List["Category"]] = relationship(back_populates="user")
+    email_reports: Mapped[List["EmailReport"]] = relationship(back_populates="user")
+    transactions: Mapped[List["Transaction"]] = relationship(back_populates="user")
+    merchant_preferences: Mapped[List["UserMerchantPreference"]] = relationship(back_populates="user")
