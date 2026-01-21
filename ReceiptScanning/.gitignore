@@ -8,3 +8,5 @@ venv/
 *.jpeg
 *.png
 *.idea
+dist/
+node_modules/
