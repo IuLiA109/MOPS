@@ -1,11 +1,11 @@
-from fastapi import Depends, FastAPI, Header, HTTPException, Request,File,UploadFile
+from fastapi import Depends, FastAPI, Header, HTTPException, Request, File, UploadFile, APIRouter
 from fastapi.responses import RedirectResponse
 from helpers.return_results import return_results
 from pydantic import BaseModel
-from main import app
 from typing import List, Dict, Union, Optional
 import os
 
+router = APIRouter(prefix="/scan", tags=["scan"])
 
 
 API_KEY = os.getenv("API_KEY")
@@ -13,18 +13,13 @@ async def verify_key(x_api_key: str = Header(...)):
     if API_KEY is None or x_api_key != API_KEY:
         raise HTTPException(status_code=403, detail="Invalid API key")
 
-@app.on_event("startup")
-async def startup_event():
-    #await init_db()
-    #de adaugat cand trecem la baza de date
-    pass
 
 class ScanResponse(BaseModel):
     produse: List[Dict[str, Union[str, float]]] = None
     total: Optional[float] = None
 
 
-@app.post("/scan", response_model=ScanResponse,dependencies=[Depends(verify_key)])
+@router.post("", response_model=ScanResponse,dependencies=[Depends(verify_key)])
 async def scan_receipt(file: UploadFile = File(...)):
     data={}
     try:
