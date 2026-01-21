@@ -3,13 +3,12 @@ from datetime import datetime, timedelta
 from sqlalchemy import String, Boolean, DateTime, Column, ForeignKey
 from sqlalchemy.orm import Mapped, validates, mapped_column, relationship
 from models.base import Base
-from models.users import User
 import re
 
 class PasswordResetToken(Base):
     __tablename__ = 'password_reset_tokens'
     id: Mapped[int] = mapped_column(primary_key=True,nullable=False,autoincrement=True)
-    user_id: Mapped["User"] = mapped_column(ForeignKey('users.id'),nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'),nullable=False)
     token: Mapped[str] = mapped_column(
         String(255),
         unique=True,

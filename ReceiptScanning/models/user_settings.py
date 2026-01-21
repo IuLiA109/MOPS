@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, validates, mapped_column, relationship
 from models.base import Base
 import re
 
-from models.users import User
+# from models.users import User
 
 
 class UserSetting(Base):
