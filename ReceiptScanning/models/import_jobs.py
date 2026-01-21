@@ -5,7 +5,6 @@ from sqlalchemy import String, Boolean, DateTime, Column, ForeignKey
 from sqlalchemy.orm import Mapped, validates, mapped_column, relationship
 from models.base import Base
 from models.transactions import Transaction
-from models.users import User
 import re
 
 
@@ -19,7 +18,7 @@ class ImportJob(Base):
     original_name: Mapped[Optional[str]] = mapped_column(String(255))
     storage_path: Mapped[Optional[str]] = mapped_column(String(500))
     processed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    error_message: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     user: Mapped["User"] = relationship(back_populates="import_jobs")

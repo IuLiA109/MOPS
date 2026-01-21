@@ -4,12 +4,8 @@ from typing import List, Optional
 from sqlalchemy import String, Boolean, DateTime, Column, ForeignKey, Numeric
 from sqlalchemy.orm import Mapped, validates, mapped_column, relationship
 
-from models.accounts import Account
 from models.base import Base
-from models.categories import Category
-from models.import_jobs import ImportJob
-from models.merchants import Merchant
-from models.users import User
+
 
 
 class Transaction(Base):
@@ -26,7 +22,7 @@ class Transaction(Base):
     amount: Mapped[float] = mapped_column(Numeric(14, 2))
     currency: Mapped[str] = mapped_column(String(3))
     transaction_date: Mapped[datetime] = mapped_column()
-    description: Mapped[Optional[str]] = mapped_column(nullable=True)
+    description: Mapped[Optional[str]] = mapped_column(String(255),nullable=True)
     source_type: Mapped[str] = mapped_column(String(30))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 

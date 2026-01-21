@@ -10,7 +10,7 @@ from models.categorization_rules import CategorizationRule
 from models.merchants import Merchant
 from models.transactions import Transaction
 from models.user_merchant_preferences import UserMerchantPreference
-from models.users import User
+
 
 
 class Category(Base):

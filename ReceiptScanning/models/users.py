@@ -3,10 +3,17 @@ from typing import List, Optional
 
 from sqlalchemy import String, Boolean, DateTime
 from sqlalchemy.orm import Mapped, validates, mapped_column, relationship
+
+from models.accounts import Account
 from models.base import Base
 import re
 
+from models.categories import Category
+from models.email_reports import EmailReport
+from models.import_jobs import ImportJob
 from models.password_reset_tokens import PasswordResetToken
+from models.transactions import Transaction
+from models.user_merchant_preferences import UserMerchantPreference
 from models.user_settings import UserSetting
 
 USERNAME_RE = re.compile(r"^[A-Za-z0-9_]{4,}$")

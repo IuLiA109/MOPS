@@ -4,7 +4,7 @@ from typing import List, Optional
 from sqlalchemy import String, Boolean, DateTime, Column, ForeignKey
 from sqlalchemy.orm import Mapped, validates, mapped_column, relationship
 from models.base import Base
-from models.users import User
+
 
 class EmailReport(Base):
     __tablename__ = "email_reports"
@@ -17,6 +17,6 @@ class EmailReport(Base):
     status: Mapped[str] = mapped_column(String(20))
     generated_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     sent_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    error_message: Mapped[Optional[str]] = mapped_column(nullable=True)
+    error_message: Mapped[Optional[str]] = mapped_column(String(500),nullable=True)
 
     user: Mapped["User"] = relationship(back_populates="email_reports")

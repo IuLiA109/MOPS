@@ -4,9 +4,7 @@ from typing import List, Optional
 from sqlalchemy import String, Boolean, DateTime, Column, ForeignKey, Numeric
 from sqlalchemy.orm import Mapped, validates, mapped_column, relationship
 from models.base import Base
-from models.categories import Category
-from models.merchants import Merchant
-from models.users import User
+
 
 
 class UserMerchantPreference(Base):

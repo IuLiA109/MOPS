@@ -4,8 +4,7 @@ from typing import List, Optional
 from sqlalchemy import String, Boolean, DateTime, Column, ForeignKey
 from sqlalchemy.orm import Mapped, validates, mapped_column, relationship
 from models.base import Base
-from models.categories import Category
-from models.users import User
+
 
 
 class CategorizationRule(Base):
