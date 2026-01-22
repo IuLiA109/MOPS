@@ -1,6 +1,6 @@
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, File, UploadFile, APIRouter
-from fastapi.responses import RedirectResponse
-from helpers.return_results import return_results
+
+from helpers.vision import extract_receipt_payload
 from pydantic import BaseModel
 from typing import List, Dict, Union, Optional
 import os
@@ -19,34 +19,25 @@ class ScanResponse(BaseModel):
     total: Optional[float] = None
 
 
-@router.post("", response_model=ScanResponse,dependencies=[Depends(verify_key)])
+@router.post("", response_model=ScanResponse, dependencies=[Depends(verify_key)])
 async def scan_receipt(file: UploadFile = File(...)):
-    data={}
     try:
         contents = await file.read()
         with open(f"temp_{file.filename}", "wb") as f:
             f.write(contents)
-            data = {"image_path": os.path.abspath(f.name)}
-    except Exception as e:
+            image_path = os.path.abspath(f.name)
+    except Exception:
         raise HTTPException(status_code=500, detail="Failed to read uploaded file")
     finally:
         await file.close()
-    
 
-    if 'image_path' not in data:
-        raise HTTPException(status_code=400, detail="Missing 'image_path'")
-    
-    image_path = data['image_path']
-    
-    rezultate = return_results(image_path)
-    
-    if rezultate is None:
-        raise HTTPException(status_code=500, detail="Failed to process the receipt image")
-    
-    response_data = ScanResponse(
-        produse=rezultate.get('produse'),
-        total=rezultate.get('total')
-    )
-    
-    
-    return response_data
+    if not image_path:
+        os.remove(image_path)
+        raise HTTPException(status_code=404, detail="Missing 'image_path'")
+    try:
+        payload = extract_receipt_payload(image_path)
+        os.remove(image_path)
+    except Exception as e:
+        os.remove(image_path)
+        raise HTTPException(status_code=500, detail=f"Failed to process the receipt image: {e}")
+    return ScanResponse(**payload)
