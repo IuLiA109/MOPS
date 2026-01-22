@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, or_
 from db.session import get_db
 from helpers.security import hash_password, verify_password, create_access_token, SECRET_KEY, ALGORITHM
+from helpers.auth_dependencies import get_current_user
 from models.users import User
 from schemas.user import UserRead,UserRegister,UserLogin
 
@@ -56,22 +57,8 @@ async def login(payload: UserLogin, response: Response, db: AsyncSession = Depen
 
 @router.get("/me", response_model=UserRead)
 async def get_me(request: Request, db: AsyncSession = Depends(get_db)):
-    token = request.cookies.get(JWT_COOKIE_NAME)
-    if not token:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = int(payload.get("sub"))
-    except (JWTError,ValueError, TypeError):
-        raise HTTPException(status_code=401, detail="Invalid token")
-
-    user = await db.get(User, user_id)
-    if not user:
-        raise HTTPException(status_code=401, detail="User no longer exists")
-
-    return user
-
+    current_user = await get_current_user(request, db)
+    return current_user
 
 @router.post("/logout")
 async def logout(response: Response):
