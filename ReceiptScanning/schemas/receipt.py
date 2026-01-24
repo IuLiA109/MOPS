@@ -12,4 +12,5 @@ class ProductBaseModel(BaseModel):
 
 class ReceiptBaseModel(BaseModel):
     total: float = 0.0
+    raw_text: str | None = None
     product: List[ProductBaseModel] = Field(default_factory=list)

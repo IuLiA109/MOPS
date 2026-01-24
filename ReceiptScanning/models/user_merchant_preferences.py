@@ -15,7 +15,6 @@ class UserMerchantPreference(Base):
     merchant_id: Mapped[int] = mapped_column(ForeignKey("merchants.id"))
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
     confidence: Mapped[float] = mapped_column(Numeric(3, 2))
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     user: Mapped["User"] = relationship(back_populates="merchant_preferences")
     merchant: Mapped["Merchant"] = relationship(back_populates="user_preferences")

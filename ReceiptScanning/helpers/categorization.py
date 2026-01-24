@@ -70,8 +70,7 @@ class CategorizationService:
     
     # helper to get merchant's default category
     async def _get_merchant_default_category(self, merchant_id: int) -> Optional[int]:
-        merchant = await self.db.get(Merchant, merchant_id)
-        return merchant.default_category_id if merchant else None
+        return None
     
     # helper to apply keyword rules
     async def _apply_keyword_rules(self, text: str, transaction_type: str) -> Optional[int]:

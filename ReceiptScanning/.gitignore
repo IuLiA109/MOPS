@@ -10,3 +10,4 @@ venv/
 *.idea
 dist/
 node_modules/
+*.ini

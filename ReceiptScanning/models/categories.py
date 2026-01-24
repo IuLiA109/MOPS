@@ -24,9 +24,6 @@ class Category(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     user: Mapped["User"] = relationship(back_populates="categories")
-
-
-    transactions: Mapped[List["Transaction"]] = relationship(back_populates="category")
     rules: Mapped[List["CategorizationRule"]] = relationship(back_populates="category")
-    merchants: Mapped[List["Merchant"]] = relationship(back_populates="default_category")
     merchant_preferences: Mapped[List["UserMerchantPreference"]] = relationship(back_populates="category")
+    transactions: Mapped[List["Transaction"]] = relationship(back_populates="category")

@@ -4,7 +4,6 @@ from typing import Optional, Text, List
 from sqlalchemy import String, Boolean, DateTime, Column, ForeignKey
 from sqlalchemy.orm import Mapped, validates, mapped_column, relationship
 from models.base import Base
-from models.transactions import Transaction
 import re
 
 
@@ -22,4 +21,3 @@ class ImportJob(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     user: Mapped["User"] = relationship(back_populates="import_jobs")
-    transactions: Mapped[List["Transaction"]] = relationship(back_populates="source_job")
