@@ -14,9 +14,7 @@ class Merchant(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     normalized_name: Mapped[str] = mapped_column(String(255), unique=True)
     display_name: Mapped[str] = mapped_column(String(255))
-    default_category_id: Mapped[Optional[int]] = mapped_column(ForeignKey("categories.id"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    default_category: Mapped["Category"] = relationship(back_populates="merchants")
     transactions: Mapped[List["Transaction"]] = relationship(back_populates="merchant")
     user_preferences: Mapped[List["UserMerchantPreference"]] = relationship(back_populates="merchant")

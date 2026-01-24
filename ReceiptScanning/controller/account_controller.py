@@ -9,6 +9,7 @@ from models.accounts import Account
 from models.transactions import Transaction
 from schemas.account import AccountCreate, AccountUpdate, AccountRead, AccountWithBalance
 from helpers.auth_dependencies import get_current_user
+from repository.account_repository import AccountRepository
 
 router = APIRouter(prefix="/accounts", tags=["accounts"])
 
@@ -92,6 +93,32 @@ async def list_accounts_with_balance(
     
     return accounts_with_balance
 
+@router.get("/{account_id}/details", response_model=AccountWithBalance)
+async def get_account_details(
+    account_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    repo = AccountRepository(db)
+    account_data = await repo.get_with_balance(account_id, current_user.id)
+
+    if not account_data:
+        raise HTTPException(status_code=404, detail="Account not found")
+
+    account, balance, transaction_count = account_data
+
+    return AccountWithBalance(
+        id=account.id,
+        user_id=account.user_id,
+        name=account.name,
+        type=account.type,
+        currency=account.currency,
+        is_default=account.is_default,
+        created_at=account.created_at,
+        balance=balance,
+        transaction_count=transaction_count,
+    )
+
 # get account by id
 @router.get("/{account_id}", response_model=AccountRead)
 async def get_account(
@@ -99,9 +126,10 @@ async def get_account(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    account = await db.get(Account, account_id)
-    
-    if not account or account.user_id != current_user.id:
+    repo = AccountRepository(db)
+    account = await repo.get_by_id(account_id, current_user.id)
+
+    if not account:
         raise HTTPException(status_code=404, detail="Account not found")
     
     return account

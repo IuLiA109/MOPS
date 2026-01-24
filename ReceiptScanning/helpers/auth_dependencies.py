@@ -19,8 +19,13 @@ async def get_current_user(request: Request, db: AsyncSession = Depends(get_db))
     except (JWTError, ValueError, TypeError):
         raise HTTPException(status_code=401, detail="Invalid token")
 
-    user = await db.get(User, user_id)
+    user: User|None = await db.get(User, user_id)
     if not user:
         raise HTTPException(status_code=401, detail="User no longer exists")
 
     return user
+
+async def get_admin_user(current_user: User = Depends(get_current_user)) -> User:
+    if current_user.role != 'admin':
+        raise HTTPException(status_code=403, detail="Not enough privileges")
+    return current_user

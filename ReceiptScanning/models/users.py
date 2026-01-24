@@ -65,7 +65,11 @@ class User(Base):
         nullable=True,
         index=True,
     )
-
+    role: Mapped[str] = mapped_column(
+        String(5),
+        nullable=False,
+        default='user'
+    )
     settings: Mapped["UserSetting"] = relationship(back_populates="user", uselist=False)
     password_reset_tokens: Mapped[List["PasswordResetToken"]] = relationship(back_populates="user")
     accounts: Mapped[List["Account"]] = relationship(back_populates="user")

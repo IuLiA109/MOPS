@@ -2,10 +2,6 @@ import re
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
 from google.cloud import vision
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from models.products import Product
-from models.receipts import Receipt
 from schemas.receipt import ReceiptBaseModel, ProductBaseModel
 
 
@@ -207,8 +203,10 @@ def extract_receipt_items(image_path: str) -> List[Item]:
 
 
 
-def extract_receipt_payload(image_path: str,db:AsyncSession,transaction_id:int) -> ReceiptBaseModel:
-    items = extract_receipt_items(image_path)
+def extract_receipt_payload(image_path: str) -> ReceiptBaseModel:
+    full_text = google_ocr_full_text(image_path)
+    lines = _extract_lines_from_vision(full_text)
+    items = _parse_items_from_lines(lines)
     total = (
         round(
             sum(
@@ -220,20 +218,10 @@ def extract_receipt_payload(image_path: str,db:AsyncSession,transaction_id:int) 
         if items
         else 0.0
     )
-    receipt = Receipt(
-        total=total,
-        transaction_id=transaction_id,
-        products=[Product(
-            name=it.name,
-            price=it.price,
-            quantity=it.quantity,
-            unit=it.unit,
-            sale=it.sale
-        ) for it in items]
-    )
-    db.add(receipt)
+
     return ReceiptBaseModel(
         total=total,
+        raw_text=full_text,
         product=[
             ProductBaseModel(
                 name=it.name,

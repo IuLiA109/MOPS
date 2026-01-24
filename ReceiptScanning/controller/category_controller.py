@@ -8,7 +8,7 @@ from models.users import User
 from models.categories import Category
 from models.transactions import Transaction
 from schemas.category import CategoryCreate, CategoryUpdate, CategoryRead, CategoryWithStats
-from helpers.auth_dependencies import get_current_user
+from helpers.auth_dependencies import get_current_user, get_admin_user
 
 router = APIRouter(prefix="/categories", tags=["categories"])
 
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/categories", tags=["categories"])
 @router.post("/", response_model=CategoryRead, status_code=201)
 async def create_category(
     payload: CategoryCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_admin_user),
     db: AsyncSession = Depends(get_db)
 ):
     if payload.type not in ['expense', 'income']:
@@ -138,7 +138,7 @@ async def get_category(
 async def update_category(
     category_id: int,
     payload: CategoryUpdate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_admin_user),
     db: AsyncSession = Depends(get_db)
 ):
     category = await db.get(Category, category_id)
@@ -173,7 +173,7 @@ async def update_category(
 @router.delete("/{category_id}", status_code=204)
 async def delete_category(
     category_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_admin_user),
     db: AsyncSession = Depends(get_db)
 ):
     category = await db.get(Category, category_id)
