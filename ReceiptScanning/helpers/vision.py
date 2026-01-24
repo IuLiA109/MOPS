@@ -1,8 +1,12 @@
 import re
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
-
 from google.cloud import vision
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from models.products import Product
+from models.receipts import Receipt
+from schemas.receipt import ReceiptBaseModel, ProductBaseModel
 
 
 @dataclass
@@ -202,13 +206,44 @@ def extract_receipt_items(image_path: str) -> List[Item]:
     return _parse_items_from_lines(lines)
 
 
-def extract_receipt_payload(image_path: str) -> dict:
+
+def extract_receipt_payload(image_path: str,db:AsyncSession,transaction_id:int) -> ReceiptBaseModel:
     items = extract_receipt_items(image_path)
-    produse = [
-        {"produs": it.name, "pret": it.price, "cantitate": it.quantity, "unitate": it.unit,"reducere":it.sale}
-        for it in items
-    ]
-    total = round(sum(it.price*it.quantity if it.unit=="BUC" else it.price for it in items), 2) if items else 0.0
-    return {"produse": produse, "total": total}
+    total = (
+        round(
+            sum(
+                it.price * it.quantity if it.unit == "BUC" else it.price
+                for it in items
+            ),
+            2,
+        )
+        if items
+        else 0.0
+    )
+    receipt = Receipt(
+        total=total,
+        transaction_id=transaction_id,
+        products=[Product(
+            name=it.name,
+            price=it.price,
+            quantity=it.quantity,
+            unit=it.unit,
+            sale=it.sale
+        ) for it in items]
+    )
+    db.add(receipt)
+    return ReceiptBaseModel(
+        total=total,
+        product=[
+            ProductBaseModel(
+                name=it.name,
+                price=it.price,
+                quantity=it.quantity,
+                unit=it.unit,
+                sale=it.sale,
+            )
+            for it in items
+        ],
+    )
 
 

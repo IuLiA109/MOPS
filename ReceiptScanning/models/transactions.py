@@ -17,7 +17,6 @@ class Transaction(Base):
     merchant_id: Mapped[Optional[int]] = mapped_column(ForeignKey("merchants.id"), nullable=True)
     category_id: Mapped[Optional[int]] = mapped_column(ForeignKey("categories.id"), nullable=True)
     source_job_id: Mapped[Optional[int]] = mapped_column(ForeignKey("import_jobs.id"), nullable=True)
-
     type: Mapped[str] = mapped_column(String(20))  # expense, income, transfer
     amount: Mapped[float] = mapped_column(Numeric(14, 2))
     currency: Mapped[str] = mapped_column(String(3))
@@ -31,3 +30,4 @@ class Transaction(Base):
     merchant: Mapped["Merchant"] = relationship(back_populates="transactions")
     category: Mapped["Category"] = relationship(back_populates="transactions")
     source_job: Mapped["ImportJob"] = relationship(back_populates="transactions")
+    receipt: Mapped["Receipt"] = relationship(back_populates="transaction")
