@@ -1,9 +1,17 @@
-from fastapi import Depends, FastAPI, Header, HTTPException, Request, File, UploadFile, APIRouter
+from idlelib.pyparse import trans
 
+from fastapi import Depends, FastAPI, Header, HTTPException, Request, File, UploadFile, APIRouter
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from db.session import get_db
+from helpers.auth_dependencies import get_current_user
 from helpers.vision import extract_receipt_payload
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Dict, Union, Optional
 import os
+
+from models.receipts import Receipt
+from schemas.receipt import ReceiptBaseModel,ProductBaseModel
 
 router = APIRouter(prefix="/scan", tags=["scan"])
 
@@ -14,13 +22,12 @@ async def verify_key(x_api_key: str = Header(...)):
         raise HTTPException(status_code=403, detail="Invalid API key")
 
 
-class ScanResponse(BaseModel):
-    produse: List[Dict[str, Union[str, float]]] = None
-    total: Optional[float] = None
 
 
-@router.post("", response_model=ScanResponse, dependencies=[Depends(verify_key)])
-async def scan_receipt(file: UploadFile = File(...)):
+
+@router.post("", response_model=ReceiptBaseModel,
+             dependencies=[Depends(verify_key),Depends(get_current_user),])
+async def scan_receipt(transaction_id: int,file: UploadFile = File(...),db: AsyncSession = Depends(get_db)):
     try:
         contents = await file.read()
         with open(f"temp_{file.filename}", "wb") as f:
@@ -35,9 +42,9 @@ async def scan_receipt(file: UploadFile = File(...)):
         os.remove(image_path)
         raise HTTPException(status_code=404, detail="Missing 'image_path'")
     try:
-        payload = extract_receipt_payload(image_path)
+        payload = extract_receipt_payload(image_path,db,transaction_id)
         os.remove(image_path)
     except Exception as e:
         os.remove(image_path)
         raise HTTPException(status_code=500, detail=f"Failed to process the receipt image: {e}")
-    return ScanResponse(**payload)
+    return payload
